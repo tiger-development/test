@@ -1,17 +1,22 @@
 class Button {
     // Initialisation
     constructor(spec, parentWidthPix, parentHeightPix) {
+        console.log(spec)
         this.id = spec.id;
+        this.type = spec.type;
         this.className = spec.className;
         this.text = spec.text;
-        this.type = spec.type;
-        this.open = spec.open;
-        this.selected = spec.selected;
+        this.target = spec.target;
+        // Size
         this.widthPerc = spec.widthPerc;
         this.heightPerc = spec.heightPerc;
         this.widthPix = parentWidthPix * this.widthPerc/100;
         this.heightPix = parentHeightPix * this.heightPerc/100;
+        // Node creation
         this.node = this.createNode();
+        // Button handler
+        this.clickOn(spec.buttonHandler, spec.subHandler);
+        //this.hoverListenerOn();
     }
 
     createNode() {
@@ -38,6 +43,22 @@ class Button {
         //}
         return divButton;
     }
+
+    clickOn(buttonHandler, subHandler) {
+
+        console.log("clickOn")
+        console.log(buttonHandler)
+        console.log(subHandler)
+        console.log(this.target)
+        if (subHandler !== false) {
+            console.log(this.target.subHandler)
+            this.target.subHandler = subHandler;
+        }
+        this.node.addEventListener("click", this.clickRef = buttonHandler.bind(this.target));
+    }
+
+
+
 
 
 }
