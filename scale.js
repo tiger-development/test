@@ -13,7 +13,6 @@ class YScale {
     }
 
     calculateAxisMinMax(data, keys, minOverride, maxOverride) {
-        console.log(data, keys, minOverride, maxOverride)
         // Generate vertical axis range and set the scale
         let minAll = Infinity;
         if (minOverride !== false) {
@@ -32,7 +31,6 @@ class YScale {
                     let maxRange = Math.max(...dateValues.map(x => x[key]));
                     minAll = Math.min(minAll, minRange)
                     maxAll = Math.max(maxAll, maxRange)
-                    console.log(label, minAll, maxAll)
                 } catch(e) {
                     console.log(e)
                 }
@@ -55,27 +53,13 @@ class YScale {
 
         // Calculate the vertical scale interval numbers
         this.verticalScaleArray = [];
-        let magnitudeSize = this.magnitude(this.max);
+        let magnitudeSize = magnitude(this.max);
         let nextInterval = Math.ceil(this.min / verticalInterval) * verticalInterval;
         let whileCheck=0;
         while (nextInterval < this.max && whileCheck < 20) {
-            this.verticalScaleArray.push({value: nextInterval, label: this.magnitudeDisplay(nextInterval, magnitudeSize)});
+            this.verticalScaleArray.push({value: nextInterval, label: magnitudeDisplay(nextInterval, magnitudeSize)});
             nextInterval += verticalInterval;
             whileCheck+=1;
-        }
-    }
-
-    magnitude(value) {
-        return Math.floor(Math.log10(value));
-    }
-
-    magnitudeDisplay(value, magnitude) {
-        if (Math.abs(magnitude) >= 6) {
-            return (value / Math.pow(10, 6)).toFixed(2) + 'm';
-        } else if (Math.abs(magnitude) >= 3) {
-            return (value / Math.pow(10, 3)).toFixed(2) + 'k';
-        } else {
-            return value.toFixed(2);
         }
     }
 }
@@ -150,8 +134,10 @@ class XScale {
             dayGap = 3;
         } else if (horizontalIntervalEstimateDays > 2) {
             dayGap = 1;
-        } else {
+        } else if (horizontalIntervalEstimateDays > 1) {
             hourGap = 3;
+        } else {
+            hourGap = 1;
         }
 
         let dateOptions = { timeZone: 'UTC', month: 'short' };

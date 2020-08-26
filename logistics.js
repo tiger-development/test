@@ -1,16 +1,18 @@
+
 let logistics = {
 
     currentSection: '',
 
     headerLinks: '',
-    titleNode: '',
+    pageTitleNode: '',
 
     // Object for switching between sections
     siteSections: {
-        wallets: {node: '', object: false},
-        charts: {node: '', object: false},
-        imports: {node: '', object: imports},
-        stacks: {node: '', object: stacks},
+        dashboard: {node: '', object: dashboard},
+        comparison: {node: '', object: comparison},
+        hourly: {node: '', object: hourly},
+        taker: {node: '', object: taker},
+        stacks: {node: '', object: stacksGraphics},
         faq: {node: '', object: false},
 
     },
@@ -25,7 +27,7 @@ let logistics = {
         this.addPageTitleListener();
 
         // Switch to preferred starting page
-        this.switchSection('imports');
+        this.switchSection('dashboard');
 
         // Set up each section
         this.sectionsSetup();
@@ -40,15 +42,7 @@ let logistics = {
 
     // Open database
     databaseSetup: async function() {
-        //await database.openAndUpdateDb('Analysis');
-        // Delete old 'HiveJourney' database
-        await database.deleteDb('HiveJourney', false);
-
-        // Create new 'HeyStack' database
-        let openDBStatus = await database.openDb('HeyStack', database.latestVersion);
-        console.log(openDBStatus);
-        console.log(database.oldVersion)
-        console.log(database.heystackDB)
+        await database.openAndUpdateDb('Analysis');
     },
 
     // Open database
@@ -63,9 +57,35 @@ let logistics = {
 
     // Open database
     runTasks: async function() {
+          ////dashboard.updateCharts('LRC', 'BTC');
+          ////database.clearObjectStore('ADABTC1h');
 
-          // Prepare STACKS page
-          stacksFigures.update();
+        //let objectStore = data.objectStoreName('1h', 'BAL', 'BTC');
+        //database.clearObjectStore(objectStore);
+
+        //await data.fetchAllDataForPairsOf('BTC', '1m', 0, 1000);
+
+
+
+        //dashboard.updateCharts('TOMO', 'BTC');
+        //await dashboard.minuteAnalysis('BTC', 'USDT', 3, false)
+        await dashboard.setCurrentPair('BTC', 'USDT');
+
+        comparison.updateMainChart('USDT');
+        hourly.updateMainChart('USDT');
+
+        //await taker.takerStudy('BTC', 'USDT');
+
+        // /*
+        await data.fetchAllDataForPairsOf('BTC', '1h', 0, 1000);
+        await data.fetchAllDataForPairsOf('BTC', '1m', 0, 1000);
+        stacksGraphics.studyToRun();
+        // */
+
+        //await data.tidyAllMinuteDataForPairsOf('BTC', '1m');
+
+
+
 
 
 
@@ -75,7 +95,7 @@ let logistics = {
     // Nodes for orienting around site
     getLogisticsNodes: function() {
         this.headerLinks = document.getElementById('headerLinks');
-        this.titleNode = document.getElementById('title');
+        this.pageTitleNode = document.getElementById('pageTitle');
     },
 
     // Nodes for each section - id in html must match section object
@@ -90,7 +110,6 @@ let logistics = {
         // Event listener for header links
         this.headerLinks.addEventListener("click", function(e) {
             for (let siteSection in logistics.siteSections) {
-                console.log(siteSection, e.target.dataset.section)
                 if (siteSection === e.target.dataset.section) {
                     logistics.switchSection(siteSection);
                 }
@@ -100,7 +119,6 @@ let logistics = {
 
     // Hide / reveal different "pages"
     switchSection: function(sectionName) {
-        console.log(sectionName)
         for (let siteSection in logistics.siteSections) {
             let section = logistics.siteSections[siteSection];
             if (siteSection == sectionName) {
@@ -114,9 +132,9 @@ let logistics = {
 
     // Listener for title
     addPageTitleListener: function() {
-        this.titleNode.addEventListener("click", function(e) {
-            if (logistics.currentSection === 'stacks') {
-                console.log('title clicked')
+        this.pageTitleNode.addEventListener("click", function(e) {
+            if (logistics.currentSection === 'dashboard') {
+                dashboard.updateCharts('ETH', 'BTC');
             }
         });
     },

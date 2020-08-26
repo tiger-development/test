@@ -7,6 +7,7 @@ class Chart {
         this.dimensions = new ChartDimensions(this.width, this.height);
         this.dataRanges = {};
         this.timePeriod = '';
+        this.handlersCollection = new HandlersCollection(this);
         //this.yScale; // created once data added
         //this.xScale; // created once data added
     }
@@ -27,9 +28,7 @@ class Chart {
     }
 
     addDataRanges(chartDataRanges) {
-        console.log(chartDataRanges)
         for (let chartDataRange of chartDataRanges) {
-            console.log(chartDataRange.label)
             if (this.timePeriod === '') {
                 this.timePeriod = chartDataRange.timePeriod;
                 chartDataRange.valid = true;
@@ -38,7 +37,6 @@ class Chart {
             }
             this.dataRanges[chartDataRange.label] = chartDataRange;
         }
-        console.log(this.dataRanges)
     }
 
     drawChart() {
@@ -164,13 +162,19 @@ class Chart {
         this.hoverListenerOn()
     }
 
+    coordinatesHandler(e) {
+        console.log(e)
+    }
+
+
+
+
 }
 
 
 class LineChart extends Chart {
     drawPaths() {
         for (let dataRangeName in this.dataRanges) {
-            console.log("-----" + dataRangeName + "-----")
             let dataRange = this.dataRanges[dataRangeName];
             let group = this.createGroup(dataRange.label, "pathGroup");
             let chartPath = new LineChartPath(dataRange, this.dimensions, this.yScale, this.xScale);
@@ -261,7 +265,6 @@ class ChartPath {
         this.dimensions = dimensions;
         this.yScale = yScale;
         this.xScale = xScale;
-        //console.log(this)
         //this.path;
         //this.colour = this.dataRange.colour;
     }
@@ -286,7 +289,7 @@ class ChartPathSingle extends ChartPath {
     constructor(dataRange, dimensions, yScale, xScale) {
         super(dataRange, dimensions, yScale, xScale);
         this.colour = this.dataRange.colour;
-        //this.path;
+        this.path;
     }
 }
 
@@ -294,10 +297,10 @@ class ChartPathMultiple extends ChartPath {
     // Initialisation
     constructor(dataRange, dimensions, yScale, xScale) {
         super(dataRange, dimensions, yScale, xScale);
-        //console.log(this)
+        console.log(this)
         this.colours = this.dataRange.colours;
-        //this.paths;
-        //console.log(this)
+        this.paths;
+        console.log(this)
     }
 }
 
@@ -307,27 +310,19 @@ class LineChartPath extends ChartPathSingle {
     }
 
     createPath() {
-        console.log(this.dataRange)
         let dataToPlot = this.dataRange.dateValues;
         // Create plot line
         let plotLinePath = '';
         let plotLetter = ' M ';
         let j = 0;
-
         for (let [i, date] of this.xScale.fullDates.entries()) {
-
-            if (Number(dataToPlot[j].date) < Number(date) && j <= dataToPlot.length - 1) {
-                while (Number(dataToPlot[j].date) <= Number(date) && j <= dataToPlot.length - 1) {
+            if (Number(dataToPlot[j].date) < Number(date) && j < dataToPlot.length - 1) {
+                while (Number(dataToPlot[j].date) <= Number(date) && j < dataToPlot.length - 1) {
                     j+=1;
                 }
             }
 
             if (Number(dataToPlot[j].date) === Number(date)) {
-                if (this.dataRange.label === 'ADA') {
-                    console.log(i, date)
-                    console.log(Number(dataToPlot[j].date), Number(date))
-                }
-
                 if (dataToPlot[j].value !== '') {
                     plotLinePath +=
                         plotLetter + (this.dimensions.borderSpace + this.dimensions.verticalScale + (i * this.dimensions.horizontalUnit)) +
@@ -353,7 +348,6 @@ class BarChartPath extends ChartPathSingle {
     //// STILL NEED TO ALLOW FOR MISSING DATA!
     createPath() {
         let dataToPlot = this.dataRange.dateValues;
-        console.log(this.dataRange.dateValues)
         // Create plot line
         let plotLinePath = '';
         for (let i=0; i<dataToPlot.length; i+=1) {
@@ -469,4 +463,124 @@ class ChartDimensions {
     addhorizontalUnit(xScale) {
         this.horizontalUnit = (this.width - (this.borderSpace * 2) - this.verticalScale) / xScale.fullDates.length;
     }
+}
+
+
+class HandlersCollection {
+    // Initialisation
+    constructor(chart) {
+        this.chart = chart;
+        this.addCircle = new Handlers(chart);
+    }
+
+    static activateCircleListeners() {
+        this.addCircle.activateCircleListeners();
+    }
+
+
+
+
+}
+
+class Handlers {
+    // Initialisation
+    constructor(chart) {
+        this.chart = chart;
+    }
+
+    activateCircleListeners() {
+        console.log('addCircle')
+        console.log(this)
+        this.
+        this.moveTempCount = 0;
+        this.clickTempCount = 0;
+        this.enterTempCount = 0;
+        this.leaveTempCount = 0;
+        this.chart.node.addEventListener("mouseenter", this.addCircleMouseEnterRef = this.addCircleEnterHandler.bind(this));
+        this.chart.node.addEventListener("mouseleave", this.addCircleMouseLeaveRef = this.addCircleLeaveHandler.bind(this));
+        //this.chart.node.addEventListener("mousemove", this.addCircleMouseMoveRef = this.addCircleMoveHandler.bind(this));
+        this.chart.node.addEventListener("click", this.addCircleClickRef = this.addCircleClickHandler.bind(this));
+    }
+
+
+    addCircleEnterHandler(e) {
+        this.enterTempCount += 1;
+        console.log(this.enterTempCount + ': addCircleEnterHandler')
+        console.log(this)
+        console.log(e)
+    }
+
+    addCircleLeaveHandler(e) {
+        this.leaveTempCount += 1;
+        console.log(this.leaveTempCount + ': addCircleLeaveHandler')
+        console.log(this)
+        console.log(e)
+    }
+
+    addCircleMoveHandler(e) {
+        this.hoverTempCount += 1;
+        console.log(this.hoverTempCount + ': addCircleMoveHandler')
+        console.log(this)
+        console.log(e)
+    }
+
+    addCircleClickHandler(e) {
+        this.clickTempCount += 1;
+        console.log(this.clickTempCount + ': addCircleClickHandler')
+        console.log(this)
+    }
+
+
+
+
+
+}
+
+class ChartShape {
+    // Initialisation
+    constructor(dimensions) {
+        this.dimensions = dimensions;
+        //this.path;
+    }
+
+    // Draw SVG plotLine
+    drawShape(path) {
+        // Draw svg path
+        let element = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        element.setAttribute('d', path);
+        element.setAttribute('stroke','rgba(220, 220, 220, 0.75)');
+        element.setAttribute('stroke-linecap', 'round');
+        element.style.strokeWidth = '1px';
+        return element;
+    }
+
+    hideShape() {
+        grandChild.setAttribute('display', 'none');
+    }
+
+}
+
+class ChartCross extends ChartShape {
+    // Initialisation
+    constructor(dimensions, x, y) {
+        super(dimensions);
+        this.path = this.createShape(x, y);
+    }
+
+    //this.node.appendChild(shape);
+
+    get shape() {
+        return this.drawShape(this.createShape())
+    }
+
+    createShape(x, y) {
+        let path =
+        ' M ' + (x - 5) + ' ' + y +
+        ' L ' + (x + 5) + ' ' + y +
+        ' M ' + x + ' ' + (y - 5) +
+        ' L ' + x + ' ' + (y + 5);
+        return path;
+    }
+
+
 }

@@ -31,10 +31,42 @@ class Page {
             this.boxes[boxSpec.id] = this.createBox(boxSpec, parent);
             parent.node.appendChild(this.boxes[boxSpec.id].node);
         }
+
+        this.subHandler;
+    }
+
+    // Set up buttons
+    setupButtons(buttonSpecs) {
+        console.log(buttonSpecs)
+        this.buttons = {};
+        for (let buttonSpec of buttonSpecs) {
+            let parent = this.boxes[buttonSpec.box];
+            parent.addButton(buttonSpec);
+        }
     }
 
     createBox(boxSpec, parent) {
         return new Box(boxSpec, parent)
+    }
+
+    chartClickHandler(e) {
+        console.log(this)
+        console.log('button clicked')
+        console.log(e)
+        console.log(this.boxes)
+
+        for (const boxName in this.boxes) {
+            let box = this.boxes[boxName];
+            if (box.hasOwnProperty('chart')) {
+                if (box.chart instanceof Chart) {
+                    console.log('instance of chart')
+                    console.log(this.subHandler)
+                    const boundSubHandler = this.subHandler.bind(box.chart.handlersCollection);
+                    boundSubHandler();
+                }
+            }
+        }
+
     }
 }
 
